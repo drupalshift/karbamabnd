@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="fa">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+      <meta name="google-site-verification" content="bywtOIGZN_ia2kZEu5xKWIZjGaE14EAZbj9FDtFi39U" />
+    <title>کارباما - درباره ما</title>
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    {% load bootstrap4 %}
+    {% bootstrap_css %}
+      <link href="https://use.fontawesome.com/releases/v5.0.8/css/all.css" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'assets/css/skew.css' %}">
+    {% bootstrap_javascript %}
+    <link rel="stylesheet" href="{% static 'assets/css/index.css' %}">
+    <link rel="stylesheet" href="{% static 'assets/css/about-us.css' %}">
+      <script src="{% static 'assets/js/index.js' %}"></script>
+  </head>
+  <body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light bg-skew">
+      <a class="navbar-brand rounded-circle unskew" href="/">
+          <img src="{% static "assets/images/karbama-logo-70.png" %}" alt="karbama-logo">
+      </a>
+      <button class="navbar-toggler unskew" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active unskew">
+            <a class="nav-link" href="/about-us/">درباره ما <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item unskew">
+            <a class="nav-link" href="/contact-us/">تماس با ما</a>
+          </li>
+            <li class="nav-item unskew">
+            <a class="nav-link" href="/terms-and-conditions/">قوانین و مقررات</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <main class="container-fluid" role="main">
+
+
+      <div class="container">
+
+        <div class="row management" style="padding-bottom: 150px; padding-top: 150px;">
+          <div class="col-md-12">
+            <h2 class="management-heading">درباره ما</h2>
+            <p class="lead">کارباما محصول پلتفرمی شرکت دانش‌بنیان ساعیان سبز هرمزگان است که در سال 1397 ، توسط سه جوان بندرعباسی تاسیس شد.</p>
+            <p class="lead">کارباما این امکان را به کاربران خود می دهد تا هر خدمتی را که در منزل مورد نیازشان است از طریق اپلیکیشن به راحتی سفارش دهند. این خدمات شامل تعمیرات لوازم خانگی ، تعمیرات کولرگازی ، لوله کشی ، برق کاری و چندین خدمات دیگر می باشد.</p>
+            <p class="lead">از مهمترین اهداف این اپلیکیشن، می‌توان به موارد زیر اشاره کرد:</p>
+              <ul>
+                  <li>سهولت و هدفمند کردن خدمت رسانی به مردم شریف بندرعباس</li>
+                  <li>ایجاد یک فضای جدید برا خدمت رسانی</li>
+                  <li>بالا بردن سطح خدمات رسانی</li>
+                  <li>اشتغال زایی برای نیرو های متخصص</li>
+              </ul>
+              <p class="text-center">کارباما آسان میشود ، این شعار تیم کارباماست</p>
+              <p>با توجه به امکان امتیاز دهی برای خدمات انجام شده برای مردم شریف بندرعباس ، این امکان وجود دارد خدمات همواره رو به بهبود و افزایش کیفیت باشد وسطخ خدمات رسانی همواره بالا برود.</p>
+          </div>
+        </div>
+      </div>
+
+
+
+
+
+
+
+        <!-- The Modal -->
+<div class="modal fade" id="recommendationFormModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">فرم انتقادات و پیشنهادات</h4>
+        <button type="button" class="close" data-dismiss="modal" style="margin: -1rem auto -1rem -1rem;">&times;</button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+          <div style="display: none;" class="alert alert-success" id="send_success">
+            <button type="button" class="close" data-dismiss="alert">x</button>
+            فرم ارسال شد.
+            </div>
+        <form id="recommendationForm">{% csrf_token %}
+          <div class="form-group">
+            <label for="name">نام و نام خانوادگی</label>
+            <input required="required" name="name" type="text" class="form-control" id="name" placeholder="علی صادقی">
+          </div>
+          <div class="form-group">
+            <label for="cell_num">شماره تماس</label>
+            <input required="required" name="cell_num" type="tel" class="form-control" id="cell_num" placeholder="09121234567">
+          </div>
+          <div class="form-group">
+            <label for="description">توضیحات</label>
+            <textarea name="description" class="form-control" id="description" rows="3"></textarea>
+          </div>
+          <button type="button" id="recommendation_form_submit" class="btn btn-primary">ارسال</button>
+        </form>
+      </div>
+
+      <!-- Modal footer -->
+      <div class="modal-footer">
+        <div style="text-align: center;" class="alert alert-light" role="alert">
+          اطلاعات پر شده در این فرم به مدیریت فرستاده می‌شود و نتیجه آن در اسرع وقت برای شما ارسال می‌گردد.
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+        <!-- Contact Us Modal -->
+<div class="modal fade" id="contactUsModal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <!-- Modal Header -->
+      <div class="modal-header">
+        <h4 class="modal-title">تماس با ما</h4>
+        <button type="button" class="close" data-dismiss="modal" style="margin: -1rem auto -1rem -1rem;">&times;</button>
+      </div>
+
+      <!-- Modal body -->
+      <div class="modal-body">
+          <div>
+              <p>تلفن پشتیبانی: 09389193592</p>
+              <p>تلفن مدیریت: 09055422496</p>
+          </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+
+      <!-- FOOTER -->
+      <footer>
+          <div class="row bg-skew" style="padding-top: 100px; padding-bottom: 150px;">
+              <div class="col-lg-3 unskew">
+                <h3>درخواست راهنمایی</h3>
+                  <hr/>
+                <ul>
+                    <li><a href="/about-us/">درباره ما</a></li>
+                    <li><a href="#" data-toggle="modal" data-target="#contactUsModal">تماس با ما</a></li>
+                    <li><a href="/terms-and-conditions/">قوانین و مقررات</a></li>
+                </ul>
+            </div><!-- /.col-lg-4 -->
+              <div class="col-lg-3 unskew">
+                <h3>انتقادات و پیشنهادات</h3>
+                  <hr/>
+                <ul>
+                    <li><a href="#" data-toggle="modal" data-target="#recommendationFormModal">انتقادات و پیشنهادات</a></li>
+                    <li><a href="#" data-toggle="modal" data-target="#jobFormModal">همکاری با کارباما</a></li>
+                </ul>
+            </div><!-- /.col-lg-4 -->
+              <div class="col-lg-3 unskew">
+                <h3>خبرنامه</h3>
+                  <hr/>
+                <p>با عضویت در خانواده بزرگ کارباما از اخبار ، تخفیف ها و پیشنهادات ویژه ما با خبر شوید. </p>
+                  <form class="form-group" id="newsletter-form" action="subscribe">
+                    <input class="form-control" type="text" placeholder="شماره موبایل خود را وارد کنید">
+                    <input style="float: left;" class="btn btn-info" type="submit" value="ثبت" id="submit-butt">
+                </form>
+            </div><!-- /.col-lg-4 -->
+              <div class="col-lg-3 unskew">
+                <ul>
+                    <li>دفتر مرکزی: بندرعباس،آزادشهر،کوچه جهادگران 8 ، ساختمان پریا</li>
+                    <hr/>
+                    <li>پشتیبانی: 09389193592</li>
+                    <hr/>
+                    <li>مدیریت: 09055422496</li>
+                    <hr/>
+                    <div id="social-butts">
+                        <a href="emailto:info@karbamabnd.com"><i class="far fa-envelope"></i></a>
+                        <a href="https://www.instagram.com/karbamabnd/"><i class="fab fa-instagram"></i></a>
+                    </div>
+                </ul>
+            </div><!-- /.col-lg-4 -->
+          </div><!-- /.row -->
+          <div class="row" id="subfoot">
+              <div class="col-lg-12">
+                  <p>کلیه حقوق این سایت به شرکت کارباما تعلق دارد</p>
+              </div>
+          </div>
+      </footer>
+    </main>
+  </body>
+</html>

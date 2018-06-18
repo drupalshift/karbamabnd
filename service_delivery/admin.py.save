@@ -1,0 +1,347 @@
+from django.contrib import admin
+from django.contrib.auth.models import Group
+from star_ratings.models import UserRating
+from .models import *
+
+
+from api.utils import active_services
+
+
+admin.site.unregister(Group)
+# admin.site.unregister(Rating)
+# admin.site.unregister(UserRating)
+
+admin.ModelAdmin.list_per_page = 10
+
+
+@admin.register(User)
+class UserAdmin(admin.ModelAdmin):
+    readonly_fields = ('invite_id',)
+    list_display = ('username', 'city', 'mobile', 'mobile_verified', 'email')
+    search_fields = ['username', 'mobile', 'email']
+    list_filter = ('created', 'city', 'mobile_verified')
+
+
+@admin.register(Personnel)
+class PersonnelAdmin(admin.ModelAdmin):
+    fields = (('type', 'city'), ('username', 'password'), ('first_name', 'last_name'), ('email', 'mobile'),
+              ('ratings',),
+              ('mobile_verified', 'email_verified', 'is_active', 'date_joined', 'description'))
+    list_display = ('username', 'first_name', 'last_name', 'city', 'mobile', 'mobile_verified', '_jobs', 'ratings')
+    search_fields = ['username', 'first_name', 'last_name', 'mobile', 'email']
+    list_filter = ('type', 'city', 'created', 'is_active', 'mobile_verified')
+
+    def _jobs(self, obj):
+        job_count = 0
+        for service_ctype in active_services():
+            job_count += service_ctype.get_all_objects_for_this_type().filter(is_active=True, personnel=obj).count()
+        return job_count
+
+    _jobs.short_description = 'کارها'
+
+
+@admin.register(Announcement)
+class AnnouncementAdmin(admin.ModelAdmin):
+    list_display = ('title', 'city', 'is_active', 'is_ad')
+    fields = (('is_active', 'title', 'city', 'is_ad'),
+              ('link', 'image'),
+              ('expiration_date',))
+    search_fields = ['title']
+    list_filter = ('is_active', 'city', 'created')
+
+
+@admin.register(ServiceDetail)
+class ServiceDetailAdmin(admin.ModelAdmin):
+    list_display = ('title', 'city', 'is_active', 'position')
+    search_fields = ['title']
+    list_filter = ('is_active', 'city', 'created')
+
+
+@admin.register(DryCleaning)
+class DryCleaningAdmin(admin.ModelAdmin):
+    readonly_fields = ('_ratings', 'ref_num')
+    fields = (('is_active', 'city', 'ref_num', '_ratings', 'status', 'client', 'personnel'),
+              ('clothes', 'blanket', 'curtain', 'is_express', 'delivery_time'),
+              ('schedule_time', 'address', 'description'))
+    list_display = ('ref_num', 'city', 'status', 'is_express', 'delivery_time', '_client_number', '_ratings')
+    search_fields = ['ref_num', 'client__mobile']
+    list_filter = ('is_active', 'is_express', 'city', 'status', 'created')
+
+    def _client_number(self, obj):
+        return obj.client.mobile
+
+    def _ratings(self, obj):
+        rating = Rating.objects.for_instance(obj)
+        return rating.average
+
+    _client_number.short_description = 'تلفن مشتری'
+    _ratings.short_description = 'امتیاز'
+    _ratings.admin_order_field = 'ratings'
+
+
+class CarpetCleaningItemsInLine(admin.TabularInline):
+    model = CarpetCleaningItem
+    extra = 1
+
+
+@admin.register(CarpetCleaning)
+class CarpetCleaningAdmin(admin.ModelAdmin):
+    readonly_fields = ('ref_num', '_ratings')
+    fields = (('is_active', 'city', 'ref_num', '_ratings', 'status', 'client', 'personnel'),
+              ('wash', 'stain', 'patch'),
+              ('schedule_time', 'address', 'description'))
+    list_display = ('ref_num', 'city', 'status', '_carpetcleaningitems', '_client_number', '_ratings')
+    search_fields = ['ref_num', 'client__mobile']
+    list_filter = ('is_active', 'city', 'status', 'created')
+
+    inlines = [
+        CarpetCleaningItemsInLine
+    ]
+
+    def _carpetcleaningitems(self, obj):
+        return obj.carpetcleaningitem_set.all().count()
+
+    def _client_number(self, obj):
+        return obj.client.mobile
+
+    def _ratings(self, obj):
+        rating = Rating.objects.for_instance(obj)
+        return rating.average
+
+    _client_number.short_description = 'تلفن مشتری'
+    _carpetcleaningitems.short_description = 'تعداد آیتم‌ها'
+    _ratings.short_description = 'امتیاز'
+    _ratings.admin_order_field = 'ratings'
+
+
+class ACItemsInLine(admin.TabularInline):
+    model = ACItem
+    extra = 1
+
+
+@admin.register(AC)
+class ACAdmin(admin.ModelAdmin):
+    readonly_fields = ('ref_num', '_ratings')
+    fields = (('is_active', 'city', 'ref_num', '_ratings', 'status', 'client', 'personnel'),
+              ('split_install', 'split_repair', 'split_service', 'window_repair', 'window_service'),
+              ('schedule_time', 'address', 'description'))
+    list_display = ('ref_num', 'city', 'status', '_acitems', '_client_number', '_ratings')
+    search_fields = ['ref_num', 'client__mobile']
+    list_filter = ('is_active', 'city', 'status', 'created')
+
+    inlines = [
+        ACItemsInLine
+    ]
+
+    def _acitems(self, obj):
+        return obj.acitem_set.all().count()
+
+    def _client_number(self, obj):
+        return obj.client.mobile
+
+    def _ratings(self, obj):
+        rating = Rating.objects.for_instance(obj)
+        return rating.average
+
+    _client_number.short_description = 'تلفن مشتری'
+    _acitems.short_description = 'تعداد آیتم‌ها'
+    _ratings.short_description = 'امتیاز'
+    _ratings.admin_order_field = 'ratings'
+
+
+class MedicalSessionInLine(admin.TabularInline):
+    model = MedicalSession
+    extra = 1
+
+
+@admin.register(Medical)
+class MedicalAdmin(admin.ModelAdmin):
+    readonly_fields = ('ref_num', '_ratings')
+    fields = (('is_active', 'city', 'ref_num', '_ratings', 'status', 'client', 'personnel'),
+              ('num_sessions', 'medic_gender'),
+              ('schedule_time', 'address', 'description'))
+    list_display = ('ref_num', 'city', 'status', 'num_sessions', 'medic_gender', '_medicalitems', '_client_number',
+                    '_ratings')
+    search_fields = ['ref_num', 'client__mobile']
+    list_filter = ('medic_gender', 'city', 'is_active', 'status', 'created')
+
+    inlines = [
+        MedicalSessionInLine
+    ]
+
+    def _medicalitems(self, obj):
+        return obj.medicalsession_set.all().count()
+
+    def _client_number(self, obj):
+        return obj.client.mobile
+
+    def _ratings(self, obj):
+        rating = Rating.objects.for_instance(obj)
+        return rating.average
+
+    _client_number.short_description = 'تلفن مشتری'
+    _medicalitems.short_description = 'تعداد آیتم‌ها'
+    _ratings.short_description = 'امتیاز'
+    _ratings.admin_order_field = 'ratings'
+
+
+@admin.register(HomeAppliance)
+class HomeApplianceAdmin(admin.ModelAdmin):
+    readonly_fields = ('ref_num', '_ratings')
+    fields = (('is_active', 'city', 'ref_num', '_ratings', 'status', 'client', 'personnel'),
+              ('service_type', 'brand', 'home_appliance_type'),
+              ('schedule_time', 'address', 'description'))
+    list_display = ('ref_num', 'city', 'status', 'service_type', 'brand', 'home_appliance_type', '_client_number',
+                    '_ratings')
+    search_fields = ['ref_num', 'client__mobile']
+    list_filter = ('service_type', 'city', 'brand', 'home_appliance_type', 'is_active', 'status', 'created')
+
+    def _client_number(self, obj):
+        return obj.client.mobile
+
+    def _ratings(self, obj):
+        rating = Rating.objects.for_instance(obj)
+        return rating.average
+
+    _client_number.short_description = 'تلفن مشتری'
+    _ratings.short_description = 'امتیاز'
+    _ratings.admin_order_field = 'ratings'
+
+
+@admin.register(Plumbing)
+class PlumbingAdmin(admin.ModelAdmin):
+    readonly_fields = ('ref_num', '_ratings')
+    fields = (('is_active', 'city', 'ref_num', '_ratings', 'status', 'client', 'personnel'),
+              ('water_and_sewage', 'water_heater', 'squat_toilet', 'flush_toilet', 'flushing_system', 'faucets',
+               'bathroom_sink', 'kitchen_sink', 'bath_tub', 'water_pump'),
+              ('schedule_time', 'address', 'description'))
+    list_display = ('ref_num', 'city', 'status', '_client_number', '_ratings')
+    search_fields = ['ref_num', 'client__mobile']
+    list_filter = ('is_active', 'city', 'status', 'created')
+
+    def _client_number(self, obj):
+        return obj.client.mobile
+
+    def _ratings(self, obj):
+        rating = Rating.objects.for_instance(obj)
+        return rating.average
+
+    _client_number.short_description = 'تلفن مشتری'
+    _ratings.short_description = 'امتیاز'
+    _ratings.admin_order_field = 'ratings'
+
+
+@admin.register(Electricity)
+class ElectricityAdmin(admin.ModelAdmin):
+    readonly_fields = ('ref_num', '_ratings')
+    fields = (('is_active', 'city', 'ref_num', '_ratings', 'status', 'client', 'personnel'),
+              ('wiring', 'switch_and_socket', 'lighting', 'fuse_box', 'earth_wiring', 'phone_and_central_wiring',
+               'ventilation', 'ventilation_and_common_spaces', 'central_antenna', 'video_intercom'),
+              ('schedule_time', 'address', 'description'))
+    list_display = ('ref_num', 'city', 'status', '_client_number', '_ratings')
+    search_fields = ['ref_num', 'client__mobile']
+    list_filter = ('is_active', 'city', 'status', 'created')
+
+    def _client_number(self, obj):
+        return obj.client.mobile
+
+    def _ratings(self, obj):
+        rating = Rating.objects.for_instance(obj)
+        return rating.average
+
+    _client_number.short_description = 'تلفن مشتری'
+    _ratings.short_description = 'امتیاز'
+    _ratings.admin_order_field = 'ratings'
+
+
+@admin.register(Tuition)
+class TuitionAdmin(admin.ModelAdmin):
+    readonly_fields = ('ref_num', '_ratings')
+    fields = (('is_active', 'city', 'ref_num', '_ratings', 'status', 'client', 'personnel'),
+              ('level', 'grade', 'lesson_name', 'tutor_gender', 'student_gender', 'num_sessions'),
+              ('schedule_time', 'address', 'description'))
+    list_display = ('ref_num', 'city', 'status', 'level', 'lesson_name', 'tutor_gender', 'student_gender',
+                    'num_sessions', '_client_number', '_ratings')
+    search_fields = ['ref_num', 'client__mobile']
+    list_filter = ('city', 'level', 'grade', 'lesson_name', 'tutor_gender', 'student_gender', 'is_active', 'status',
+                   'created')
+
+    def _client_number(self, obj):
+        return obj.client.mobile
+
+    def _ratings(self, obj):
+        rating = Rating.objects.for_instance(obj)
+        return rating.average
+
+    _client_number.short_description = 'تلفن مشتری'
+    _ratings.short_description = 'امتیاز'
+    _ratings.admin_order_field = 'ratings'
+
+
+@admin.register(Truck)
+class TruckAdmin(admin.ModelAdmin):
+    readonly_fields = ('ref_num', '_ratings')
+    fields = (('is_active', 'city', 'ref_num', '_ratings', 'status', 'client', 'personnel'),
+              ('truck_type', 'num_worker'),
+              ('schedule_time', 'address', 'description'))
+    list_display = ('ref_num', 'city', 'status', 'truck_type', 'num_worker', '_client_number', '_ratings')
+    search_fields = ['ref_num', 'client__mobile']
+    list_filter = ('city', 'truck_type', 'is_active', 'status', 'created')
+
+    def _client_number(self, obj):
+        return obj.client.mobile
+
+    def _ratings(self, obj):
+        rating = Rating.objects.for_instance(obj)
+        return rating.average
+
+    _client_number.short_description = 'تلفن مشتری'
+    _ratings.short_description = 'امتیاز'
+    _ratings.admin_order_field = 'ratings'
+
+
+@admin.register(Cleaning)
+class CleaningAdmin(admin.ModelAdmin):
+    readonly_fields = ('ref_num', '_ratings')
+    fields = (('is_active', 'city', 'ref_num', '_ratings', 'status', 'client', 'personnel'), ('building_type', 'hour',
+                                                                                             'male_worker_num',
+                                                                                             'female_worker_num'),
+              ('schedule_time', 'address', 'description'))
+    list_display = ('ref_num', 'city', 'status', 'building_type', 'hour', '_client_number', '_ratings')
+    search_fields = ['ref_num', 'client__mobile']
+    list_filter = ('city', 'building_type', 'is_active', 'status', 'created')
+
+    def _client_number(self, obj):
+        return obj.client.mobile
+
+    def _ratings(self, obj):
+        rating = Rating.objects.for_instance(obj)
+        return rating.average
+
+    _client_number.short_description = 'تلفن مشتری'
+    _ratings.short_description = 'امتیاز'
+    _ratings.admin_order_field = 'ratings'
+
+
+@admin.register(BaseService)
+class BaseServiceAdmin(admin.ModelAdmin):
+    readonly_fields = ('ref_num', '_ratings')
+    fields = (('is_active', 'city', 'ref_num', '_ratings', 'status', 'client', 'personnel'),
+              ('schedule_time', 'address', 'description'))
+    list_display = ('ref_num', 'city', 'status', 'is_active', 'personnel', '_client_number', '_ratings')
+    search_fields = ['ref_num', 'client__mobile']
+    list_filter = ('is_active', 'city', 'status', 'created')
+    date_hierarchy = 'created'
+
+    def _client_number(self, obj):
+        return obj.client.mobile
+
+    def _ratings(self, obj):
+        rating = Rating.objects.for_instance(obj)
+        return rating.average
+
+    _client_number.short_description = 'تلفن مشتری'
+    _ratings.short_description = 'امتیاز'
+    _ratings.admin_order_field = 'ratings'
+
+# TODO list_per_page default is 100. can set it to lower

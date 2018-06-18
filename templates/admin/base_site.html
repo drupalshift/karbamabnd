@@ -1,0 +1,10 @@
+{% extends "admin/base.html" %}
+{% load static %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">
+    <img src="{% static "assets/images/karbama-logo-h38-w.png" %}">
+</a></h1>
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
